@@ -697,6 +697,8 @@
 
     </div>
 
+    <pre id="vod-debug" style="margin-top:16px;width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px;font-size:10px;color:#4ECBA0;white-space:pre-wrap;word-break:break-all;display:block;"></pre>
+
     <!-- QR Code -->
     <div class="qr-section">
       <p class="qr-label">Scan to share</p>
@@ -839,12 +841,32 @@
       if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
       const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
 
-      // Kick VOD URLs are /videos/{uuid} — uuid is a proper RFC4122 UUID.
-      // The API also returns a `slug` field like "49864e1f-nz-town" — we must ignore that.
-      // Only accept a value that matches the full UUID pattern: 8-4-4-4-12 hex chars.
-      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const rawUuid = data.uuid ?? data.id ?? '';
-      const safeSlug = UUID_RE.test(String(rawUuid)) ? String(rawUuid) : '';
+      // Kick VOD URLs use a UUID: /videos/{8-4-4-4-12 hex}
+      // The `slug` field is NOT the UUID (e.g. "49864e1f-nz-town") — ignore it.
+      // Try direct uuid/id fields first, then extract from thumbnail URL as fallback.
+      const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+      let safeSlug = '';
+
+      // 1. Check dedicated uuid/id fields
+      for (const key of ['uuid', 'id', 'video_id']) {
+        const val = String(data[key] ?? '');
+        if (UUID_RE.test(val)) { safeSlug = val.match(UUID_RE)[0]; break; }
+      }
+
+      // 2. Fallback: extract UUID from thumbnail/source URL (Kick CDN paths contain the UUID)
+      if (!safeSlug) {
+        const urlFields = [
+          data.thumbnail?.src, data.thumbnail?.url, data.thumbnail,
+          data.preview_thumbnail?.src, data.source, data.playback_url, data.url
+        ];
+        for (const f of urlFields) {
+          if (typeof f === 'string') {
+            const m = f.match(UUID_RE);
+            if (m) { safeSlug = m[0]; break; }
+          }
+        }
+      }
 
       // Thumbnail
       const rawThumb = data.thumbnail?.src ?? data.thumbnail?.url ?? data.thumbnail ?? data.preview_thumbnail?.src ?? '';
@@ -882,7 +904,10 @@
         finalHref = parsed.href;
       } catch (_) { return; }
 
-      // ── Upgrade card in-place ────────────────────────
+      // DEBUG — remove after diagnosis
+      const debugEl = document.getElementById('vod-debug');
+      if (debugEl) debugEl.textContent = JSON.stringify(data, null, 2);
+
       const card      = document.getElementById('vod-card');
       const titleEl   = document.getElementById('vod-title');
       const durEl     = document.getElementById('vod-duration');
