@@ -467,6 +467,58 @@
     .api-status.loaded { opacity: 1; background: var(--accent); }
     .api-status.error  { opacity: 1; background: #ff4444; }
 
+    /* ── VOD card ────────────────────────── */
+    .card-vod {
+      opacity: 0;
+      transform: translateY(16px);
+      display: none; /* hidden until API confirms a VOD exists */
+    }
+
+    .card-vod.visible {
+      display: flex;
+      animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.72s forwards;
+    }
+
+    .card-kick.card-vod .bar {
+      background: rgba(83,252,24,0.4);
+      box-shadow: none;
+    }
+
+    .vod-thumbnail {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .vod-duration {
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    .vod-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(78,203,160,0.08);
+      border: 1px solid rgba(78,203,160,0.2);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
     /* ── QR ──────────────────────────────── */
     .qr-section {
       margin-top: 30px;
@@ -645,6 +697,29 @@
         </div>
       </a>
 
+      <!-- Latest VOD (shown only when API returns one) -->
+      <a class="link-card card-kick card-vod" id="vod-card" href="https://kick.com/brandooski/videos" target="_blank" rel="noopener noreferrer">
+        <div class="bar"></div>
+        <div class="icon-wrap" id="vod-thumb-wrap">
+          <!-- Replaced with thumbnail by JS if available -->
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M4 3h4v7.5L13.5 3H19l-7 9 7 9h-5.5L8 13.5V21H4V3z"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-meta" style="margin-top:0;margin-bottom:3px;">
+            <span class="vod-badge">Latest VOD</span>
+          </div>
+          <div class="card-title" id="vod-title" style="font-size:13px;">Loading…</div>
+          <div class="vod-duration" id="vod-duration"></div>
+        </div>
+        <div class="card-actions">
+          <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
     </div>
 
     <!-- QR Code -->
@@ -743,7 +818,129 @@
     }
 
     fetchKickStatus();
-    new QRCode(document.getElementById('qrcode'), {
+
+    // ── Latest VOD fetch ──────────────────────────────
+    // Uses the unofficial v2 videos/latest endpoint — read-only, public data.
+    // Security: all data written via textContent (never innerHTML).
+    // Validated: types checked, strings length-capped, URL must match kick.com.
+    async function fetchLatestVOD() {
+      const SLUG      = 'brandooski';
+      const TITLE_MAX = 80;   // max chars to display
+      const ALLOWED_HOST = 'kick.com';
+
+      const PROXIED_URL = `https://kick.com/api/v2/channels/${SLUG}/videos/latest`;
+      const PROXY_URLS = [
+        `https://corsproxy.io/?url=${encodeURIComponent(PROXIED_URL)}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(PROXIED_URL)}`
+      ];
+
+      let data = null;
+
+      for (const url of PROXY_URLS) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+          if (!res.ok) continue;
+          const json = await res.json();
+          // allorigins wraps response in { contents: "..." }
+          const raw = json.contents ? JSON.parse(json.contents) : json;
+          // Accept either a direct object or { data: [...] } / { video: {...} }
+          if (raw && typeof raw === 'object') {
+            data = Array.isArray(raw.data) ? raw.data[0]
+                 : raw.video            ? raw.video
+                 : raw.id               ? raw
+                 : null;
+          }
+          if (data) break;
+        } catch (_) {
+          continue;
+        }
+      }
+
+      if (!data || typeof data !== 'object') return; // silent fail — card stays hidden
+
+      // ── Sanitise each field ──────────────────────────
+      // Title — must be a non-empty string, capped
+      const rawTitle = data.session_title ?? data.title ?? data.stream_title ?? '';
+      if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
+      const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
+
+      // Slug / ID for URL — alphanumeric, hyphens only
+      const rawSlug = data.slug ?? data.uuid ?? data.id ?? '';
+      const safeSlug = String(rawSlug).replace(/[^a-zA-Z0-9\-_]/g, '');
+
+      // Thumbnail — must be a string starting with https://
+      // and hostname must be kick.com or a known kick CDN
+      const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com'];
+      const rawThumb = data.thumbnail?.url ?? data.thumbnail ?? '';
+      let safeThumb = null;
+      if (typeof rawThumb === 'string' && rawThumb.startsWith('https://')) {
+        try {
+          const thumbHost = new URL(rawThumb).hostname.replace(/^www\./, '');
+          if (ALLOWED_IMG_HOSTS.some(h => thumbHost === h || thumbHost.endsWith('.' + h))) {
+            safeThumb = rawThumb;
+          }
+        } catch (_) { /* invalid URL, skip */ }
+      }
+
+      // Duration — must be a positive number (seconds or ms)
+      const rawDur = data.duration ?? data.length ?? null;
+      let safeDuration = '';
+      if (typeof rawDur === 'number' && rawDur > 0 && isFinite(rawDur)) {
+        // Kick returns duration in seconds; guard for milliseconds (> 86400s = 1 day)
+        const seconds = rawDur > 86400 ? Math.floor(rawDur / 1000) : rawDur;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        safeDuration = h > 0
+          ? `${h}h ${String(m).padStart(2,'0')}m`
+          : `${m}m ${String(s).padStart(2,'0')}s`;
+      }
+
+      // Build the VOD URL — only allow kick.com destination
+      const vodHref = safeSlug
+        ? `https://kick.com/${SLUG}/videos/${safeSlug}`
+        : `https://kick.com/${SLUG}/videos`;
+
+      // Validate final URL (belt-and-suspenders)
+      let finalHref;
+      try {
+        const parsed = new URL(vodHref);
+        if (parsed.hostname.replace(/^www\./, '') !== ALLOWED_HOST) return;
+        finalHref = parsed.href;
+      } catch (_) { return; }
+
+      // ── Write to DOM ─────────────────────────────────
+      const card      = document.getElementById('vod-card');
+      const titleEl   = document.getElementById('vod-title');
+      const durEl     = document.getElementById('vod-duration');
+      const thumbWrap = document.getElementById('vod-thumb-wrap');
+
+      // textContent only — never innerHTML — prevents XSS
+      titleEl.textContent = safeTitle;
+      if (safeDuration) durEl.textContent = safeDuration;
+
+      // Thumbnail — create img element programmatically
+      if (safeThumb) {
+        const img = document.createElement('img');
+        img.className = 'vod-thumbnail';
+        img.alt = '';
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        // Only set src after element is created (avoids race with attr reflection)
+        img.src = safeThumb;
+        img.onerror = () => img.remove(); // remove silently if image fails
+        thumbWrap.innerHTML = '';         // clear the fallback icon
+        thumbWrap.appendChild(img);
+      }
+
+      // Set the card href securely via setAttribute
+      card.setAttribute('href', finalHref);
+
+      // Reveal the card
+      card.classList.add('visible');
+    }
+
+    fetchLatestVOD();(document.getElementById('qrcode'), {
       text: 'https://brandininz.github.io/brandooski',
       width: 144,
       height: 144,
