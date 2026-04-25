@@ -839,10 +839,12 @@
       if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
       const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
 
-      // UUID for URL — Kick VOD URLs are /videos/{uuid} format
-      // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-      const rawSlug = data.uuid ?? data.slug ?? data.id ?? '';
-      const safeSlug = String(rawSlug).replace(/[^a-zA-Z0-9\-]/g, '');
+      // Kick VOD URLs are /videos/{uuid} — uuid is a proper RFC4122 UUID.
+      // The API also returns a `slug` field like "49864e1f-nz-town" — we must ignore that.
+      // Only accept a value that matches the full UUID pattern: 8-4-4-4-12 hex chars.
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const rawUuid = data.uuid ?? data.id ?? '';
+      const safeSlug = UUID_RE.test(String(rawUuid)) ? String(rawUuid) : '';
 
       // Thumbnail
       const rawThumb = data.thumbnail?.src ?? data.thumbnail?.url ?? data.thumbnail ?? data.preview_thumbnail?.src ?? '';
