@@ -839,9 +839,10 @@
       if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
       const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
 
-      // Slug / ID for URL
-      const rawSlug = data.slug ?? data.uuid ?? data.id ?? '';
-      const safeSlug = String(rawSlug).replace(/[^a-zA-Z0-9\-_]/g, '');
+      // UUID for URL — Kick VOD URLs are /videos/{uuid} format
+      // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      const rawSlug = data.uuid ?? data.slug ?? data.id ?? '';
+      const safeSlug = String(rawSlug).replace(/[^a-zA-Z0-9\-]/g, '');
 
       // Thumbnail
       const rawThumb = data.thumbnail?.src ?? data.thumbnail?.url ?? data.thumbnail ?? data.preview_thumbnail?.src ?? '';
