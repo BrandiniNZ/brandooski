@@ -6,7 +6,7 @@
   <title>brandooski</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
@@ -22,7 +22,7 @@
       --text: #f0f0f0;
       --text-muted: #666666;
       --text-dim: #3f3f3f;
-      --font-display: 'Space Mono', monospace;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
       --font-body: 'Plus Jakarta Sans', sans-serif;
       --radius: 14px;
       --radius-sm: 8px;
@@ -39,7 +39,6 @@
       overflow-x: hidden;
     }
 
-    /* ── Noise ───────────────────────────── */
     .noise {
       position: fixed;
       inset: 0;
@@ -50,7 +49,6 @@
       background-size: 180px;
     }
 
-    /* ── Layout ──────────────────────────── */
     .page {
       position: relative;
       z-index: 1;
@@ -63,7 +61,6 @@
       margin: 0 auto;
     }
 
-    /* ── Avatar ──────────────────────────── */
     .avatar-wrap {
       position: relative;
       margin-bottom: 22px;
@@ -106,7 +103,6 @@
       50%       { box-shadow: 0 0 22px rgba(83,252,24,0.85); }
     }
 
-    /* ── Name & bio ──────────────────────── */
     .profile-name {
       font-family: var(--font-display);
       font-size: 26px;
@@ -120,6 +116,7 @@
       animation: up 0.55s cubic-bezier(0.16,1,0.3,1) 0.16s forwards;
     }
 
+    .profile-name .name-part { color: var(--text); }
     .profile-name .accent { color: var(--accent); }
 
     .profile-handle {
@@ -146,7 +143,6 @@
       animation: up 0.55s cubic-bezier(0.16,1,0.3,1) 0.28s forwards;
     }
 
-    /* ── Schedule ────────────────────────── */
     .schedule {
       display: flex;
       align-items: center;
@@ -163,7 +159,6 @@
     }
 
     .schedule-icon { font-size: 14px; flex-shrink: 0; }
-
     .schedule-body { flex: 1; }
 
     .schedule-label {
@@ -176,10 +171,7 @@
       margin-bottom: 5px;
     }
 
-    .days-row {
-      display: flex;
-      gap: 4px;
-    }
+    .days-row { display: flex; gap: 4px; }
 
     .day-chip {
       font-size: 10px;
@@ -223,7 +215,6 @@
       letter-spacing: 0.06em;
     }
 
-    /* ── Divider ─────────────────────────── */
     .divider {
       width: 100%;
       height: 1px;
@@ -233,7 +224,6 @@
       animation: show 0.5s ease 0.42s forwards;
     }
 
-    /* ── Section label ───────────────────── */
     .section-label {
       width: 100%;
       font-size: 9px;
@@ -247,7 +237,6 @@
       animation: show 0.5s ease 0.46s forwards;
     }
 
-    /* ── Cards ───────────────────────────── */
     .links {
       display: flex;
       flex-direction: column;
@@ -394,19 +383,15 @@
       .link-card:hover .arrow { transform: translateX(2px); color: var(--text-muted); }
     }
 
-    /* KICK */
     .card-kick .bar { background: var(--kick-green); box-shadow: 0 0 8px rgba(83,252,24,0.35); }
     .card-kick .icon-wrap { background: rgba(83,252,24,0.07); color: var(--kick-green); }
 
-    /* TikTok */
     .card-tiktok .bar { background: linear-gradient(to bottom, var(--tiktok-pink), #00F2EA); }
     .card-tiktok .icon-wrap { background: rgba(255,0,79,0.07); color: var(--tiktok-pink); }
 
-    /* stagger */
     .links .link-card:nth-child(1) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
     .links .link-card:nth-child(2) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.62s forwards; }
 
-    /* ── Kick live info ──────────────────── */
     .stream-title {
       font-size: 11px;
       font-weight: 500;
@@ -432,7 +417,6 @@
     .viewer-count.visible { display: inline; }
     .stream-title.visible { display: block; }
 
-    /* offline state — dim the live dot */
     .live-dot.offline {
       background: #444;
       box-shadow: none;
@@ -451,7 +435,6 @@
       animation: none;
     }
 
-    /* API status indicator — tiny dot top-right of card */
     .api-status {
       position: absolute;
       top: 10px;
@@ -471,11 +454,6 @@
     .card-vod {
       opacity: 0;
       transform: translateY(16px);
-      display: none; /* hidden until API confirms a VOD exists */
-    }
-
-    .card-vod.visible {
-      display: flex;
       animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.72s forwards;
     }
 
@@ -584,7 +562,6 @@
       opacity: 1;
     }
 
-    /* ── Footer ──────────────────────────── */
     .footer {
       margin-top: 40px;
       font-size: 10px;
@@ -616,11 +593,10 @@
       <div class="live-dot" id="avatar-live-dot"></div>
     </div>
 
-    <h1 class="profile-name">brando<span class="accent">oski</span></h1>
+    <h1 class="profile-name"><span class="name-part">bran</span><span class="accent">dooski</span></h1>
     <p class="profile-handle">@brandooski</p>
     <p class="profile-bio">IRL streamer in NZ</p>
 
-    <!-- Schedule -->
     <div class="schedule">
       <span class="schedule-icon">📅</span>
       <div class="schedule-body">
@@ -697,11 +673,10 @@
         </div>
       </a>
 
-      <!-- Latest VOD (shown only when API returns one) -->
+      <!-- Latest VOD — always visible, upgraded by API if available -->
       <a class="link-card card-kick card-vod" id="vod-card" href="https://kick.com/brandooski/videos" target="_blank" rel="noopener noreferrer">
         <div class="bar"></div>
         <div class="icon-wrap" id="vod-thumb-wrap">
-          <!-- Replaced with thumbnail by JS if available -->
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M4 3h4v7.5L13.5 3H19l-7 9 7 9h-5.5L8 13.5V21H4V3z"/>
           </svg>
@@ -710,7 +685,7 @@
           <div class="card-meta" style="margin-top:0;margin-bottom:3px;">
             <span class="vod-badge">Latest VOD</span>
           </div>
-          <div class="card-title" id="vod-title" style="font-size:13px;">Loading…</div>
+          <div class="card-title" id="vod-title" style="font-size:13px;">Watch past streams</div>
           <div class="vod-duration" id="vod-duration"></div>
         </div>
         <div class="card-actions">
@@ -734,81 +709,74 @@
   </main>
 
   <script>
-    // ── Kick API ─────────────────────────────────────
-    // Uses the unofficial v1 channel endpoint — no auth required.
-    // Falls back gracefully if CORS blocks or API is down.
-    async function fetchKickStatus() {
-      const SLUG = 'brandooski';
-      const badge    = document.getElementById('kick-live-badge');
-      const label    = document.getElementById('kick-live-label');
-      const viewers  = document.getElementById('kick-viewers');
-      const title    = document.getElementById('kick-stream-title');
-      const avatarDot = document.getElementById('avatar-live-dot');
-      const apiDot   = document.getElementById('kick-api-status');
+    // ── QR Code ──────────────────────────────────────
+    // FIX: was merged with fetchLatestVOD() call — missing `new QRCode(...)`
+    new QRCode(document.getElementById('qrcode'), {
+      text: 'https://brandininz.github.io/brandooski',
+      width: 144,
+      height: 144,
+      colorDark: '#111111',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
 
-      // Try a CORS proxy as Kick's API blocks direct browser requests
+    // ── Highlight today's day chip ───────────────────
+    const todayIdx = new Date().getDay();
+    document.querySelectorAll('.day-chip').forEach(chip => {
+      if (parseInt(chip.dataset.day) === todayIdx) {
+        chip.classList.add('today-marker');
+      }
+    });
+
+    // ── Kick live status ─────────────────────────────
+    async function fetchKickStatus() {
+      const SLUG      = 'brandooski';
+      const badge     = document.getElementById('kick-live-badge');
+      const label     = document.getElementById('kick-live-label');
+      const viewers   = document.getElementById('kick-viewers');
+      const title     = document.getElementById('kick-stream-title');
+      const avatarDot = document.getElementById('avatar-live-dot');
+      const apiDot    = document.getElementById('kick-api-status');
+
       const URLS = [
         `https://corsproxy.io/?url=https://kick.com/api/v1/channels/${SLUG}`,
         `https://api.allorigins.win/get?url=${encodeURIComponent(`https://kick.com/api/v1/channels/${SLUG}`)}`
       ];
 
       let data = null;
-
       for (const url of URLS) {
         try {
           const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
           if (!res.ok) continue;
           const json = await res.json();
-          // allorigins wraps in { contents: "..." }
           data = json.contents ? JSON.parse(json.contents) : json;
           if (data) break;
-        } catch (_) {
-          continue;
-        }
+        } catch (_) { continue; }
       }
 
-      if (!data) {
-        // API unreachable — show api error dot, leave badge as-is
-        apiDot.classList.add('error');
-        return;
-      }
+      if (!data) { apiDot.classList.add('error'); return; }
 
       apiDot.classList.add('loaded');
-
       const livestream = data.livestream;
       const isLive = !!(livestream && livestream.is_live);
 
       if (isLive) {
-        // Update live badge
         label.textContent = 'Live';
         badge.classList.remove('offline');
-
-        // Viewer count
         const vc = livestream.viewer_count;
         if (vc != null) {
           viewers.textContent = `${vc.toLocaleString()} watching`;
           viewers.classList.add('visible');
         }
-
-        // Stream title
         const st = livestream.session_title;
-        if (st) {
-          title.textContent = st;
-          title.classList.add('visible');
-        }
-
-        // Avatar dot stays green
+        if (st) { title.textContent = st; title.classList.add('visible'); }
         avatarDot.classList.remove('offline');
-
       } else {
-        // Offline state
         badge.classList.add('offline');
         label.textContent = 'Offline';
         avatarDot.classList.add('offline');
         viewers.classList.remove('visible');
         title.classList.remove('visible');
-
-        // Show last stream title if available
         const recent = data.recent_livestream || livestream;
         if (recent && recent.session_title) {
           title.textContent = `Last: ${recent.session_title}`;
@@ -819,59 +787,64 @@
 
     fetchKickStatus();
 
-    // ── Latest VOD fetch ──────────────────────────────
-    // Uses the unofficial v2 videos/latest endpoint — read-only, public data.
-    // Security: all data written via textContent (never innerHTML).
-    // Validated: types checked, strings length-capped, URL must match kick.com.
+    // ── Latest VOD ───────────────────────────────────
+    // Card is always visible with a fallback. API upgrades it in-place.
+    // Tries multiple known Kick endpoint shapes via two CORS proxies.
     async function fetchLatestVOD() {
-      const SLUG      = 'brandooski';
-      const TITLE_MAX = 80;   // max chars to display
+      const SLUG         = 'brandooski';
+      const TITLE_MAX    = 80;
       const ALLOWED_HOST = 'kick.com';
+      const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com', 'vod.kick.com'];
 
-      const PROXIED_URL = `https://kick.com/api/v2/channels/${SLUG}/videos/latest`;
-      const PROXY_URLS = [
-        `https://corsproxy.io/?url=${encodeURIComponent(PROXIED_URL)}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(PROXIED_URL)}`
+      // Try multiple endpoint shapes — Kick's API is inconsistent
+      const ENDPOINTS = [
+        `https://kick.com/api/v2/channels/${SLUG}/videos`,
+        `https://kick.com/api/v1/channels/${SLUG}/videos`,
+        `https://kick.com/api/v2/channels/${SLUG}/clips`,
+      ];
+      const PROXIES = [
+        u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+        u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
       ];
 
       let data = null;
 
-      for (const url of PROXY_URLS) {
-        try {
-          const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
-          if (!res.ok) continue;
-          const json = await res.json();
-          // allorigins wraps response in { contents: "..." }
-          const raw = json.contents ? JSON.parse(json.contents) : json;
-          // Accept either a direct object or { data: [...] } / { video: {...} }
-          if (raw && typeof raw === 'object') {
-            data = Array.isArray(raw.data) ? raw.data[0]
-                 : raw.video            ? raw.video
-                 : raw.id               ? raw
-                 : null;
-          }
-          if (data) break;
-        } catch (_) {
-          continue;
+      outer:
+      for (const endpoint of ENDPOINTS) {
+        for (const makeProxy of PROXIES) {
+          try {
+            const res = await fetch(makeProxy(endpoint), { signal: AbortSignal.timeout(7000) });
+            if (!res.ok) continue;
+            const json = await res.json();
+            const raw = json.contents ? JSON.parse(json.contents) : json;
+            if (!raw || typeof raw !== 'object') continue;
+
+            // Extract first video from various response shapes
+            let candidate = null;
+            if (Array.isArray(raw.data) && raw.data.length > 0)        candidate = raw.data[0];
+            else if (Array.isArray(raw.videos) && raw.videos.length > 0) candidate = raw.videos[0];
+            else if (Array.isArray(raw) && raw.length > 0)              candidate = raw[0];
+            else if (raw.id || raw.uuid)                                 candidate = raw;
+
+            if (candidate && typeof candidate === 'object') { data = candidate; break outer; }
+          } catch (_) { continue; }
         }
       }
 
-      if (!data || typeof data !== 'object') return; // silent fail — card stays hidden
+      // No API data — card stays with fallback text, that's fine
+      if (!data) return;
 
-      // ── Sanitise each field ──────────────────────────
-      // Title — must be a non-empty string, capped
-      const rawTitle = data.session_title ?? data.title ?? data.stream_title ?? '';
+      // Sanitise title
+      const rawTitle = data.session_title ?? data.title ?? data.stream_title ?? data.clip_title ?? '';
       if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
       const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
 
-      // Slug / ID for URL — alphanumeric, hyphens only
+      // Slug / ID for URL
       const rawSlug = data.slug ?? data.uuid ?? data.id ?? '';
       const safeSlug = String(rawSlug).replace(/[^a-zA-Z0-9\-_]/g, '');
 
-      // Thumbnail — must be a string starting with https://
-      // and hostname must be kick.com or a known kick CDN
-      const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com'];
-      const rawThumb = data.thumbnail?.url ?? data.thumbnail ?? '';
+      // Thumbnail
+      const rawThumb = data.thumbnail?.src ?? data.thumbnail?.url ?? data.thumbnail ?? data.preview_thumbnail?.src ?? '';
       let safeThumb = null;
       if (typeof rawThumb === 'string' && rawThumb.startsWith('https://')) {
         try {
@@ -879,14 +852,13 @@
           if (ALLOWED_IMG_HOSTS.some(h => thumbHost === h || thumbHost.endsWith('.' + h))) {
             safeThumb = rawThumb;
           }
-        } catch (_) { /* invalid URL, skip */ }
+        } catch (_) {}
       }
 
-      // Duration — must be a positive number (seconds or ms)
+      // Duration
       const rawDur = data.duration ?? data.length ?? null;
       let safeDuration = '';
       if (typeof rawDur === 'number' && rawDur > 0 && isFinite(rawDur)) {
-        // Kick returns duration in seconds; guard for milliseconds (> 86400s = 1 day)
         const seconds = rawDur > 86400 ? Math.floor(rawDur / 1000) : rawDur;
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -896,12 +868,10 @@
           : `${m}m ${String(s).padStart(2,'0')}s`;
       }
 
-      // Build the VOD URL — only allow kick.com destination
+      // Build & validate VOD URL
       const vodHref = safeSlug
         ? `https://kick.com/${SLUG}/videos/${safeSlug}`
         : `https://kick.com/${SLUG}/videos`;
-
-      // Validate final URL (belt-and-suspenders)
       let finalHref;
       try {
         const parsed = new URL(vodHref);
@@ -909,55 +879,33 @@
         finalHref = parsed.href;
       } catch (_) { return; }
 
-      // ── Write to DOM ─────────────────────────────────
+      // ── Upgrade card in-place ────────────────────────
       const card      = document.getElementById('vod-card');
       const titleEl   = document.getElementById('vod-title');
       const durEl     = document.getElementById('vod-duration');
       const thumbWrap = document.getElementById('vod-thumb-wrap');
 
-      // textContent only — never innerHTML — prevents XSS
       titleEl.textContent = safeTitle;
       if (safeDuration) durEl.textContent = safeDuration;
 
-      // Thumbnail — create img element programmatically
       if (safeThumb) {
         const img = document.createElement('img');
         img.className = 'vod-thumbnail';
         img.alt = '';
         img.decoding = 'async';
         img.loading = 'lazy';
-        // Only set src after element is created (avoids race with attr reflection)
         img.src = safeThumb;
-        img.onerror = () => img.remove(); // remove silently if image fails
-        thumbWrap.innerHTML = '';         // clear the fallback icon
+        img.onerror = () => img.remove();
+        thumbWrap.innerHTML = '';
         thumbWrap.appendChild(img);
       }
 
-      // Set the card href securely via setAttribute
       card.setAttribute('href', finalHref);
-
-      // Reveal the card
-      card.classList.add('visible');
     }
 
-    fetchLatestVOD();(document.getElementById('qrcode'), {
-      text: 'https://brandininz.github.io/brandooski',
-      width: 144,
-      height: 144,
-      colorDark: '#111111',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
+    fetchLatestVOD();
 
-    // Highlight today's day chip
-    const todayIdx = new Date().getDay();
-    document.querySelectorAll('.day-chip').forEach(chip => {
-      if (parseInt(chip.dataset.day) === todayIdx) {
-        chip.classList.add('today-marker');
-      }
-    });
-
-    // Copy buttons
+    // ── Copy buttons ─────────────────────────────────
     let toastTimer;
 
     document.querySelectorAll('.copy-btn').forEach(btn => {
@@ -967,14 +915,11 @@
         const text = btn.dataset.copy;
 
         const doToast = () => {
-          // swap icon to checkmark
           btn.querySelector('svg').innerHTML =
             '<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
           btn.style.color = 'var(--accent)';
           btn.style.borderColor = 'rgba(78,203,160,0.5)';
-
           showToast('Copied ' + text + ' ✓');
-
           setTimeout(() => {
             btn.querySelector('svg').innerHTML =
               '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
