@@ -406,6 +406,67 @@
     .links .link-card:nth-child(1) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
     .links .link-card:nth-child(2) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.62s forwards; }
 
+    /* ── Kick live info ──────────────────── */
+    .stream-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 3px;
+      font-family: var(--font-body);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+      display: none;
+    }
+
+    .viewer-count {
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      display: none;
+    }
+
+    .viewer-count.visible { display: inline; }
+    .stream-title.visible { display: block; }
+
+    /* offline state — dim the live dot */
+    .live-dot.offline {
+      background: #444;
+      box-shadow: none;
+      animation: none;
+    }
+
+    .live-badge.offline {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.1);
+      color: var(--text-dim);
+      box-shadow: none;
+    }
+
+    .live-badge.offline .live-dot-sm {
+      background: #555;
+      animation: none;
+    }
+
+    /* API status indicator — tiny dot top-right of card */
+    .api-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      opacity: 0;
+      transition: opacity 0.3s ease, background 0.3s ease;
+    }
+
+    .api-status.loaded { opacity: 1; background: var(--accent); }
+    .api-status.error  { opacity: 1; background: #ff4444; }
+
     /* ── QR ──────────────────────────────── */
     .qr-section {
       margin-top: 30px;
@@ -500,7 +561,7 @@
 
     <div class="avatar-wrap">
       <div class="avatar-box">B</div>
-      <div class="live-dot"></div>
+      <div class="live-dot" id="avatar-live-dot"></div>
     </div>
 
     <h1 class="profile-name">brando<span class="accent">oski</span></h1>
@@ -538,12 +599,15 @@
             <path d="M4 3h4v7.5L13.5 3H19l-7 9 7 9h-5.5L8 13.5V21H4V3z"/>
           </svg>
         </div>
+        <div class="api-status" id="kick-api-status"></div>
         <div class="card-text">
           <div class="card-title">Kick.com</div>
           <div class="card-meta">
             <span class="card-sub">brandooski</span>
-            <span class="live-badge"><span class="live-dot-sm"></span>Live</span>
+            <span class="live-badge" id="kick-live-badge"><span class="live-dot-sm"></span><span id="kick-live-label">Live</span></span>
+            <span class="viewer-count" id="kick-viewers"></span>
           </div>
+          <div class="stream-title" id="kick-stream-title"></div>
         </div>
         <div class="card-actions">
           <button class="copy-btn" data-copy="brandooski" aria-label="Copy Kick username">
@@ -595,7 +659,90 @@
   </main>
 
   <script>
-    // QR Code
+    // ── Kick API ─────────────────────────────────────
+    // Uses the unofficial v1 channel endpoint — no auth required.
+    // Falls back gracefully if CORS blocks or API is down.
+    async function fetchKickStatus() {
+      const SLUG = 'brandooski';
+      const badge    = document.getElementById('kick-live-badge');
+      const label    = document.getElementById('kick-live-label');
+      const viewers  = document.getElementById('kick-viewers');
+      const title    = document.getElementById('kick-stream-title');
+      const avatarDot = document.getElementById('avatar-live-dot');
+      const apiDot   = document.getElementById('kick-api-status');
+
+      // Try a CORS proxy as Kick's API blocks direct browser requests
+      const URLS = [
+        `https://corsproxy.io/?url=https://kick.com/api/v1/channels/${SLUG}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(`https://kick.com/api/v1/channels/${SLUG}`)}`
+      ];
+
+      let data = null;
+
+      for (const url of URLS) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+          if (!res.ok) continue;
+          const json = await res.json();
+          // allorigins wraps in { contents: "..." }
+          data = json.contents ? JSON.parse(json.contents) : json;
+          if (data) break;
+        } catch (_) {
+          continue;
+        }
+      }
+
+      if (!data) {
+        // API unreachable — show api error dot, leave badge as-is
+        apiDot.classList.add('error');
+        return;
+      }
+
+      apiDot.classList.add('loaded');
+
+      const livestream = data.livestream;
+      const isLive = !!(livestream && livestream.is_live);
+
+      if (isLive) {
+        // Update live badge
+        label.textContent = 'Live';
+        badge.classList.remove('offline');
+
+        // Viewer count
+        const vc = livestream.viewer_count;
+        if (vc != null) {
+          viewers.textContent = `${vc.toLocaleString()} watching`;
+          viewers.classList.add('visible');
+        }
+
+        // Stream title
+        const st = livestream.session_title;
+        if (st) {
+          title.textContent = st;
+          title.classList.add('visible');
+        }
+
+        // Avatar dot stays green
+        avatarDot.classList.remove('offline');
+
+      } else {
+        // Offline state
+        badge.classList.add('offline');
+        label.textContent = 'Offline';
+        avatarDot.classList.add('offline');
+        viewers.classList.remove('visible');
+        title.classList.remove('visible');
+
+        // Show last stream title if available
+        const recent = data.recent_livestream || livestream;
+        if (recent && recent.session_title) {
+          title.textContent = `Last: ${recent.session_title}`;
+          title.classList.add('visible');
+        }
+      }
+    }
+
+    fetchKickStatus();
     new QRCode(document.getElementById('qrcode'), {
       text: 'https://brandininz.github.io/brandooski',
       width: 144,
