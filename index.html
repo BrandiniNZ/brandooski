@@ -765,10 +765,9 @@
       </a>
 
       <!-- Clips -->
-      <a class="link-card card-clips card-vod" id="clip-card" href="https://kickbot.com/clips/brandooski" target="_blank" rel="noopener noreferrer">
+      <a class="link-card card-clips card-vod" href="https://kickbot.com/clips/brandooski" target="_blank" rel="noopener noreferrer">
         <div class="bar"></div>
-        <div class="icon-wrap" id="clip-thumb-wrap">
-          <!-- Scissors / clip icon -->
+        <div class="icon-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
             <line x1="20" y1="4" x2="8.12" y2="15.88"/>
@@ -777,11 +776,8 @@
           </svg>
         </div>
         <div class="card-text">
-          <div class="card-meta" style="margin-top:0;margin-bottom:3px;">
-            <span class="clip-badge">Latest Clip</span>
-          </div>
-          <div class="card-title" id="clip-title" style="font-size:13px;">Watch clips</div>
-          <div class="clip-views" id="clip-views"></div>
+          <div class="card-title">Clips</div>
+          <div class="card-sub">kickbot.com/clips/brandooski</div>
         </div>
         <div class="card-actions">
           <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -988,112 +984,6 @@
     }
 
     fetchLatestVOD();
-
-    // ── Latest Clip ──────────────────────────────────
-    // Tries Kick's v2 clips endpoint, falls back to KickBot page link.
-    async function fetchLatestClip() {
-      const SLUG = 'brandooski';
-      const TITLE_MAX = 80;
-      const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com', 'clips.kick.com', 'vod.kick.com'];
-
-      const ENDPOINTS = [
-        `https://kick.com/api/v2/channels/${SLUG}/clips?cursor=0&sort=date`,
-        `https://kick.com/api/v2/channels/${SLUG}/clips?cursor=0&sort=view`,
-        `https://kick.com/api/v1/channels/${SLUG}/clips`,
-      ];
-      const PROXIES = [
-        u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-      ];
-
-      let clip = null;
-
-      outer:
-      for (const endpoint of ENDPOINTS) {
-        for (const makeProxy of PROXIES) {
-          try {
-            const res = await fetch(makeProxy(endpoint), { signal: AbortSignal.timeout(7000) });
-            if (!res.ok) continue;
-            const json = await res.json();
-            const raw = json.contents ? JSON.parse(json.contents) : json;
-            if (!raw || typeof raw !== 'object') continue;
-
-            let candidate = null;
-            if (Array.isArray(raw.data) && raw.data.length > 0)          candidate = raw.data[0];
-            else if (Array.isArray(raw.clips) && raw.clips.length > 0)   candidate = raw.clips[0];
-            else if (Array.isArray(raw) && raw.length > 0)               candidate = raw[0];
-
-            if (candidate && typeof candidate === 'object') { clip = candidate; break outer; }
-          } catch (_) { continue; }
-        }
-      }
-
-      // No API data — card stays with fallback "Watch clips" text
-      if (!clip) return;
-
-      const rawTitle = clip.title ?? clip.clip_title ?? clip.session_title ?? '';
-      if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
-      const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
-
-      // Thumbnail
-      const rawThumb = clip.thumbnail_url ?? clip.thumbnail?.src ?? clip.thumbnail?.url ?? clip.thumbnail ?? '';
-      let safeThumb = null;
-      if (typeof rawThumb === 'string' && rawThumb.startsWith('https://')) {
-        try {
-          const thumbHost = new URL(rawThumb).hostname.replace(/^www\./, '');
-          if (ALLOWED_IMG_HOSTS.some(h => thumbHost === h || thumbHost.endsWith('.' + h))) {
-            safeThumb = rawThumb;
-          }
-        } catch (_) {}
-      }
-
-      // View count
-      const rawViews = clip.views ?? clip.view_count ?? null;
-      let safeViews = '';
-      if (typeof rawViews === 'number' && rawViews >= 0) {
-        safeViews = rawViews >= 1000
-          ? `${(rawViews / 1000).toFixed(1)}k views`
-          : `${rawViews} views`;
-      }
-
-      // Clip URL — prefer clip's own url field, else KickBot
-      let finalHref = 'https://kickbot.com/clips/brandooski';
-      const rawUrl = clip.clip_url ?? clip.url ?? '';
-      if (typeof rawUrl === 'string' && rawUrl.startsWith('https://')) {
-        try {
-          const parsed = new URL(rawUrl);
-          const host = parsed.hostname.replace(/^www\./, '');
-          if (host === 'kick.com' || host.endsWith('.kick.com') || host === 'kickbot.com') {
-            finalHref = parsed.href;
-          }
-        } catch (_) {}
-      }
-
-      // Upgrade card in-place
-      const titleEl   = document.getElementById('clip-title');
-      const viewsEl   = document.getElementById('clip-views');
-      const thumbWrap = document.getElementById('clip-thumb-wrap');
-      const card      = document.getElementById('clip-card');
-
-      titleEl.textContent = safeTitle;
-      if (safeViews) viewsEl.textContent = safeViews;
-
-      if (safeThumb) {
-        const img = document.createElement('img');
-        img.className = 'clip-thumbnail';
-        img.alt = '';
-        img.decoding = 'async';
-        img.loading = 'lazy';
-        img.src = safeThumb;
-        img.onerror = () => img.remove();
-        thumbWrap.innerHTML = '';
-        thumbWrap.appendChild(img);
-      }
-
-      card.setAttribute('href', finalHref);
-    }
-
-    fetchLatestClip();
 
     // ── Copy buttons ─────────────────────────────────
     let toastTimer;
