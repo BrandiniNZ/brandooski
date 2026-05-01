@@ -392,9 +392,11 @@
     .card-discord .bar { background: #5865F2; box-shadow: 0 0 8px rgba(88,101,242,0.35); }
     .card-discord .icon-wrap { background: rgba(88,101,242,0.08); color: #5865F2; }
 
-    .links .link-card:nth-child(1) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
+    .links .link-card:nth-child(1) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.50s forwards; }
     .links .link-card:nth-child(2) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.62s forwards; }
     .links .link-card:nth-child(3) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.74s forwards; }
+    .links .link-card:nth-child(4) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.80s forwards; }
+    .links .link-card:nth-child(5) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.86s forwards; }
 
     .stream-title {
       font-size: 11px;
@@ -458,7 +460,6 @@
     .card-vod {
       opacity: 0;
       transform: translateY(16px);
-      animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.72s forwards;
     }
 
     .card-kick.card-vod .bar {
@@ -501,6 +502,51 @@
       text-transform: uppercase;
     }
 
+    /* ── Clips card ──────────────────────── */
+    .card-clips .bar {
+      background: linear-gradient(to bottom, #ff6b35, #ff9500);
+      box-shadow: 0 0 8px rgba(255,107,53,0.35);
+    }
+    .card-clips .icon-wrap {
+      background: rgba(255,107,53,0.08);
+      color: #ff6b35;
+    }
+
+    .clip-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,107,53,0.08);
+      border: 1px solid rgba(255,107,53,0.25);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      color: #ff6b35;
+      text-transform: uppercase;
+    }
+
+    .clip-thumbnail {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .clip-views {
+      font-size: 9px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
     /* ── QR ──────────────────────────────── */
     .qr-section {
       margin-top: 30px;
@@ -510,7 +556,7 @@
       align-items: center;
       gap: 12px;
       opacity: 0;
-      animation: show 0.5s ease 0.88s forwards;
+      animation: show 0.5s ease 1.0s forwards;
     }
 
     .qr-label {
@@ -574,7 +620,7 @@
       letter-spacing: 0.06em;
       text-align: center;
       opacity: 0;
-      animation: show 0.5s ease 1.05s forwards;
+      animation: show 0.5s ease 1.1s forwards;
     }
 
     @keyframes up   { to { opacity: 1; transform: translateY(0); } }
@@ -696,7 +742,7 @@
         </div>
       </a>
 
-      <!-- Latest VOD — always visible, upgraded by API if available -->
+      <!-- Latest VOD -->
       <a class="link-card card-kick card-vod" id="vod-card" href="https://kick.com/brandooski/videos" target="_blank" rel="noopener noreferrer">
         <div class="bar"></div>
         <div class="icon-wrap" id="vod-thumb-wrap">
@@ -710,6 +756,32 @@
           </div>
           <div class="card-title" id="vod-title" style="font-size:13px;">Watch past streams</div>
           <div class="vod-duration" id="vod-duration"></div>
+        </div>
+        <div class="card-actions">
+          <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
+      <!-- Clips -->
+      <a class="link-card card-clips card-vod" id="clip-card" href="https://kickbot.com/clips/brandooski" target="_blank" rel="noopener noreferrer">
+        <div class="bar"></div>
+        <div class="icon-wrap" id="clip-thumb-wrap">
+          <!-- Scissors / clip icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-meta" style="margin-top:0;margin-bottom:3px;">
+            <span class="clip-badge">Latest Clip</span>
+          </div>
+          <div class="card-title" id="clip-title" style="font-size:13px;">Watch clips</div>
+          <div class="clip-views" id="clip-views"></div>
         </div>
         <div class="card-actions">
           <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -733,7 +805,6 @@
 
   <script>
     // ── QR Code ──────────────────────────────────────
-    // FIX: was merged with fetchLatestVOD() call — missing `new QRCode(...)`
     new QRCode(document.getElementById('qrcode'), {
       text: 'https://brandininz.github.io/brandooski',
       width: 144,
@@ -811,15 +882,12 @@
     fetchKickStatus();
 
     // ── Latest VOD ───────────────────────────────────
-    // Card is always visible with a fallback. API upgrades it in-place.
-    // Tries multiple known Kick endpoint shapes via two CORS proxies.
     async function fetchLatestVOD() {
       const SLUG         = 'brandooski';
       const TITLE_MAX    = 80;
       const ALLOWED_HOST = 'kick.com';
       const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com', 'vod.kick.com'];
 
-      // Try multiple endpoint shapes — Kick's API is inconsistent
       const ENDPOINTS = [
         `https://kick.com/api/v2/channels/${SLUG}/videos`,
         `https://kick.com/api/v1/channels/${SLUG}/videos`,
@@ -842,7 +910,6 @@
             const raw = json.contents ? JSON.parse(json.contents) : json;
             if (!raw || typeof raw !== 'object') continue;
 
-            // Extract first video from various response shapes
             let candidate = null;
             if (Array.isArray(raw.data) && raw.data.length > 0)        candidate = raw.data[0];
             else if (Array.isArray(raw.videos) && raw.videos.length > 0) candidate = raw.videos[0];
@@ -854,20 +921,16 @@
         }
       }
 
-      // No API data — card stays with fallback text, that's fine
       if (!data) return;
 
-      // Sanitise title
       const rawTitle = data.session_title ?? data.title ?? data.stream_title ?? data.clip_title ?? '';
       if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
       const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
 
-      // UUID is nested: data.video.uuid
       const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
       const rawUuid = data.video?.uuid ?? '';
       const safeSlug = UUID_RE.test(rawUuid) ? rawUuid : '';
 
-      // Thumbnail
       const rawThumb = data.thumbnail?.src ?? data.thumbnail?.url ?? data.thumbnail ?? data.preview_thumbnail?.src ?? '';
       let safeThumb = null;
       if (typeof rawThumb === 'string' && rawThumb.startsWith('https://')) {
@@ -879,7 +942,6 @@
         } catch (_) {}
       }
 
-      // Duration
       const rawDur = data.duration ?? data.length ?? null;
       let safeDuration = '';
       if (typeof rawDur === 'number' && rawDur > 0 && isFinite(rawDur)) {
@@ -892,7 +954,6 @@
           : `${m}m ${String(s).padStart(2,'0')}s`;
       }
 
-      // Build & validate VOD URL
       const vodHref = safeSlug
         ? `https://kick.com/${SLUG}/videos/${safeSlug}`
         : `https://kick.com/${SLUG}/videos`;
@@ -903,7 +964,6 @@
         finalHref = parsed.href;
       } catch (_) { return; }
 
-      // ── Upgrade card in-place ────────────────────────
       const card      = document.getElementById('vod-card');
       const titleEl   = document.getElementById('vod-title');
       const durEl     = document.getElementById('vod-duration');
@@ -928,6 +988,112 @@
     }
 
     fetchLatestVOD();
+
+    // ── Latest Clip ──────────────────────────────────
+    // Tries Kick's v2 clips endpoint, falls back to KickBot page link.
+    async function fetchLatestClip() {
+      const SLUG = 'brandooski';
+      const TITLE_MAX = 80;
+      const ALLOWED_IMG_HOSTS = ['kick.com', 'images.kick.com', 'stream.kick.com', 'files.kick.com', 'clips.kick.com', 'vod.kick.com'];
+
+      const ENDPOINTS = [
+        `https://kick.com/api/v2/channels/${SLUG}/clips?cursor=0&sort=date`,
+        `https://kick.com/api/v2/channels/${SLUG}/clips?cursor=0&sort=view`,
+        `https://kick.com/api/v1/channels/${SLUG}/clips`,
+      ];
+      const PROXIES = [
+        u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+        u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+      ];
+
+      let clip = null;
+
+      outer:
+      for (const endpoint of ENDPOINTS) {
+        for (const makeProxy of PROXIES) {
+          try {
+            const res = await fetch(makeProxy(endpoint), { signal: AbortSignal.timeout(7000) });
+            if (!res.ok) continue;
+            const json = await res.json();
+            const raw = json.contents ? JSON.parse(json.contents) : json;
+            if (!raw || typeof raw !== 'object') continue;
+
+            let candidate = null;
+            if (Array.isArray(raw.data) && raw.data.length > 0)          candidate = raw.data[0];
+            else if (Array.isArray(raw.clips) && raw.clips.length > 0)   candidate = raw.clips[0];
+            else if (Array.isArray(raw) && raw.length > 0)               candidate = raw[0];
+
+            if (candidate && typeof candidate === 'object') { clip = candidate; break outer; }
+          } catch (_) { continue; }
+        }
+      }
+
+      // No API data — card stays with fallback "Watch clips" text
+      if (!clip) return;
+
+      const rawTitle = clip.title ?? clip.clip_title ?? clip.session_title ?? '';
+      if (typeof rawTitle !== 'string' || rawTitle.trim().length === 0) return;
+      const safeTitle = rawTitle.trim().slice(0, TITLE_MAX);
+
+      // Thumbnail
+      const rawThumb = clip.thumbnail_url ?? clip.thumbnail?.src ?? clip.thumbnail?.url ?? clip.thumbnail ?? '';
+      let safeThumb = null;
+      if (typeof rawThumb === 'string' && rawThumb.startsWith('https://')) {
+        try {
+          const thumbHost = new URL(rawThumb).hostname.replace(/^www\./, '');
+          if (ALLOWED_IMG_HOSTS.some(h => thumbHost === h || thumbHost.endsWith('.' + h))) {
+            safeThumb = rawThumb;
+          }
+        } catch (_) {}
+      }
+
+      // View count
+      const rawViews = clip.views ?? clip.view_count ?? null;
+      let safeViews = '';
+      if (typeof rawViews === 'number' && rawViews >= 0) {
+        safeViews = rawViews >= 1000
+          ? `${(rawViews / 1000).toFixed(1)}k views`
+          : `${rawViews} views`;
+      }
+
+      // Clip URL — prefer clip's own url field, else KickBot
+      let finalHref = 'https://kickbot.com/clips/brandooski';
+      const rawUrl = clip.clip_url ?? clip.url ?? '';
+      if (typeof rawUrl === 'string' && rawUrl.startsWith('https://')) {
+        try {
+          const parsed = new URL(rawUrl);
+          const host = parsed.hostname.replace(/^www\./, '');
+          if (host === 'kick.com' || host.endsWith('.kick.com') || host === 'kickbot.com') {
+            finalHref = parsed.href;
+          }
+        } catch (_) {}
+      }
+
+      // Upgrade card in-place
+      const titleEl   = document.getElementById('clip-title');
+      const viewsEl   = document.getElementById('clip-views');
+      const thumbWrap = document.getElementById('clip-thumb-wrap');
+      const card      = document.getElementById('clip-card');
+
+      titleEl.textContent = safeTitle;
+      if (safeViews) viewsEl.textContent = safeViews;
+
+      if (safeThumb) {
+        const img = document.createElement('img');
+        img.className = 'clip-thumbnail';
+        img.alt = '';
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        img.src = safeThumb;
+        img.onerror = () => img.remove();
+        thumbWrap.innerHTML = '';
+        thumbWrap.appendChild(img);
+      }
+
+      card.setAttribute('href', finalHref);
+    }
+
+    fetchLatestClip();
 
     // ── Copy buttons ─────────────────────────────────
     let toastTimer;
