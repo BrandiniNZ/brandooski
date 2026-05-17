@@ -396,6 +396,9 @@
     .card-discord .bar { background: #5865F2; box-shadow: 0 0 8px rgba(88,101,242,0.35); }
     .card-discord .icon-wrap { background: rgba(88,101,242,0.08); color: #5865F2; }
 
+    .card-twitch .bar { background: #9146FF; box-shadow: 0 0 8px rgba(145,70,255,0.35); }
+    .card-twitch .icon-wrap { background: rgba(145,70,255,0.07); color: #9146FF; }
+
     .links .link-card:nth-child(1) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.50s forwards; }
     .links .link-card:nth-child(2) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.62s forwards; }
     .links .link-card:nth-child(3) { animation: up 0.5s cubic-bezier(0.16,1,0.3,1) 0.74s forwards; }
@@ -767,6 +770,30 @@
         </div>
       </a>
 
+      <!-- Twitch -->
+      <a class="link-card card-twitch" href="https://twitch.tv/brandooskiiii" target="_blank" rel="noopener">
+        <div class="bar"></div>
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M2 2L22 2L22 16L18 20L14 20L12 22L10 20L2 20Z"/>
+          </svg>
+        </div>
+        <div class="card-text">
+          <div class="card-title">Twitch</div>
+          <div class="card-sub">@brandooskiiii</div>
+        </div>
+        <div class="card-actions">
+          <button class="copy-btn" data-copy="@brandooskiiii" aria-label="Copy Twitch username">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+          <svg class="arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
       <!-- Instagram -->
       <a class="link-card card-instagram" href="https://instagram.com/branden.hhhh" target="_blank" rel="noopener">
         <div class="bar"></div>
@@ -946,6 +973,21 @@
     }
 
     fetchKickStatus();
+
+    // ── Twitch live status ───────────────────────
+    async function fetchTwitchStatus() {
+      const USER = 'brandooskiiii';
+      try {
+        const res = await fetch(`https://decapi.me/twitch/uptime/${USER}`);
+        if (!res.ok) throw new Error('network');
+        const txt = await res.text();
+        console.log('Twitch status:', txt);
+      } catch (e) {
+        console.error('Failed Twitch status', e);
+      }
+    }
+
+    fetchTwitchStatus();
 
     // ── Latest VOD ───────────────────────────────────
     async function fetchLatestVOD() {
